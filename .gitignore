@@ -2,3 +2,4 @@
 /tuxify-server
 /*.png
 /*.jpeg
+!tuxified.png

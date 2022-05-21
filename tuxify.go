@@ -9,18 +9,20 @@ import (
 	"image/color"
 )
 
+// Tuxify ecb-encrypts the given image. If key is null, a key will be randomly generated.
+// Alpha values are ignored in the source image.
 func Tuxify(key []byte, src image.Image) (image.Image, error) {
 	rect := src.Bounds()
 
 	// Put all raw RGB values into a buffer...
 	buffy := &bytes.Buffer{}
-	pixel := make([]byte, 3)
+	rgb := make([]byte, 3)
 	for y := 0; y < rect.Dy(); y++ {
 		for x := 0; x < rect.Dx(); x++ {
 			rgba := color.RGBAModel.Convert(src.At(x, y))
 			r, g, b, _ := rgba.RGBA()
-			pixel[0], pixel[1], pixel[2] = byte(r), byte(g), byte(b)
-			buffy.Write(pixel)
+			rgb[0], rgb[1], rgb[2] = byte(r), byte(g), byte(b)
+			buffy.Write(rgb)
 		}
 	}
 
@@ -35,8 +37,8 @@ func Tuxify(key []byte, src image.Image) (image.Image, error) {
 	dst := image.NewRGBA(rect)
 	for y := 0; y < rect.Dy(); y++ {
 		for x := 0; x < rect.Dx(); x++ {
-			r.Read(pixel)
-			dst.Set(x, y, color.RGBA{pixel[0], pixel[1], pixel[2], 255})
+			r.Read(rgb)
+			dst.Set(x, y, color.RGBA{rgb[0], rgb[1], rgb[2], 255})
 		}
 	}
 

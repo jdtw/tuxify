@@ -1,6 +1,6 @@
 # tuxify
 
-Tuxify your jpeg and png images as a service!
+[Tuxify](https://words.filippo.io/the-ecb-penguin/) your jpeg and png images as a service!
 
 ```
 curl -s -F 'img=@input.png' -o tuxified.png https://tuxify.art

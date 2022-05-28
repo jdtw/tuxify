@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/hex"
 	"flag"
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	"image/png"
 	"io"
 	"log"
 	"os"
+	"path"
 
 	"jdtw.dev/tuxify"
 )
@@ -42,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dst, err := tuxify.Tuxify(key, src)
+	dst, key, err := tuxify.Tuxify(key, src)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,4 +62,6 @@ func main() {
 	if err := png.Encode(w, dst); err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Fprintf(os.Stderr, "Encrypted %s with key %s\n", path.Base(*in), hex.EncodeToString(key))
 }

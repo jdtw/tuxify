@@ -10,8 +10,8 @@ import (
 )
 
 // Tuxify ecb-encrypts the given image. If key is null, a key will be randomly generated.
-// Alpha values are ignored in the source image.
-func Tuxify(key []byte, src image.Image) (image.Image, error) {
+// Alpha values are ignored in the source image. Returns the encrypted image and encryption key.
+func Tuxify(key []byte, src image.Image) (image.Image, []byte, error) {
 	rect := src.Bounds()
 
 	// Put all raw RGB values into a buffer...
@@ -27,9 +27,13 @@ func Tuxify(key []byte, src image.Image) (image.Image, error) {
 	}
 
 	// Encrypt RGB values with the given key (or a random key if the key parameter is nil)
+	if key == nil {
+		key = make([]byte, 16)
+		rand.Read(key)
+	}
 	ciphertext, err := encrypt(key, buffy.Bytes())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Put the encrypted RGB values into a new image...
@@ -42,14 +46,10 @@ func Tuxify(key []byte, src image.Image) (image.Image, error) {
 		}
 	}
 
-	return dst, nil
+	return dst, key, nil
 }
 
 func encrypt(key []byte, data []byte) ([]byte, error) {
-	if key == nil {
-		key = make([]byte, 16)
-		rand.Read(key)
-	}
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

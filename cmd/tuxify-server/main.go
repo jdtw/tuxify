@@ -86,7 +86,6 @@ func tuxifyHandler(l *rate.Limiter) http.HandlerFunc {
 			return
 		}
 		defer f.Close()
-		log.Printf("Tuxifying %s, Content-Type: %s, Size: %d", hdr.Filename, hdr.Header.Get("Content-Type"), hdr.Size)
 
 		// Decode the image...
 		src, _, err := image.Decode(f)
@@ -97,17 +96,20 @@ func tuxifyHandler(l *rate.Limiter) http.HandlerFunc {
 		}
 
 		// Do the transform...
-		dst, err := tuxify.Tuxify(key, src)
+		dst, key, err := tuxify.Tuxify(key, src)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		// And respond...
+		hexKey := hex.EncodeToString(key)
+		w.Header().Set("X-Key", hexKey)
+		w.Header().Set("Content-Type", "image/png")
 		if err := png.Encode(w, dst); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Content-Type", "image/png")
+		log.Printf("Tuxified %s, Content-Type: %s, Size: %d, Key: %s", hdr.Filename, hdr.Header.Get("Content-Type"), hdr.Size, hexKey)
 	}
 }

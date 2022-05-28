@@ -9,7 +9,7 @@ curl -s -F 'img=@input.png' -o tuxified.png https://tuxify.art
 Or install locally...
 
 ```
-go install github.com/jdtw/tuxify/cmd/tuxify@latest
+go install jdtw.dev/tuxify/cmd/tuxify@latest
 tuxify --in input.png --out tuxified.png
 ```
 

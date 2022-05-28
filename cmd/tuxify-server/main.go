@@ -18,8 +18,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jdtw/tuxify"
 	"golang.org/x/time/rate"
+	"jdtw.dev/tuxify"
 )
 
 var (

@@ -1,4 +1,4 @@
-module github.com/jdtw/tuxify
+module jdtw.dev/tuxify
 
 go 1.18
 

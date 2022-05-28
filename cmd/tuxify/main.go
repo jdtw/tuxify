@@ -10,7 +10,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jdtw/tuxify"
+	"jdtw.dev/tuxify"
 )
 
 var (

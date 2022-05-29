@@ -16,6 +16,7 @@ import (
 	"image/png"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -26,6 +27,7 @@ var (
 	port      = flag.Int("port", 8080, "Port to listen on")
 	maxBytes  = flag.Int64("max-bytes", 5<<20, "Request size limit")
 	rateLimit = flag.Duration("rate", 1*time.Second, "Rate limit")
+	redirect  = flag.String("redirect", "https://github.com/jdtw/tuxify", "Redirect GET requests to the root path.")
 )
 
 const (
@@ -37,6 +39,12 @@ const (
 
 func main() {
 	flag.Parse()
+
+	if *redirect != "" {
+		if _, err := url.Parse(*redirect); err != nil {
+			log.Fatalf("Invalid URL %q: %v", *redirect, err)
+		}
+	}
 
 	limiter := rate.NewLimiter(rate.Every(*rateLimit), 10)
 
@@ -50,6 +58,10 @@ func tuxifyHandler(l *rate.Limiter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.Error(w, "Not found", http.StatusNotFound)
+			return
+		}
+		if r.Method == "GET" && *redirect != "" {
+			http.Redirect(w, r, *redirect, http.StatusFound)
 			return
 		}
 		if r.Method != "POST" {

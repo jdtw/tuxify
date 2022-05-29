@@ -19,7 +19,7 @@ mkdir "${TESTDIR}"
 go build -o "${TESTDIR}" ./...
 
 echo "Testing tuxify-server..."
-"${TESTDIR}/tuxify-server" --port "${PORT}" &
+"${TESTDIR}/tuxify-server" --port "${PORT}" --redirect "https://example.com" &
 until curl -s -X POST "${ADDR}" -o /dev/null; do
     echo "Waiting for server to start..."
     sleep 1
@@ -44,6 +44,12 @@ result=$(curl -s -F 'img=@./testdata/tux.png' \
 echo "${result}"
 test "${result}" = "400"
 cmp -s "${TESTDIR}/out.png" ./testdata/expected.png || (echo "Images differ!"; exit 1)
+echo
+
+echo "Testing tuxify-server redirect..."
+result=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "${ADDR}")
+echo "${result}"
+test "${result}" = "302 https://example.com/"
 echo
 
 echo "Testing tuxify-server X-Key header..."
